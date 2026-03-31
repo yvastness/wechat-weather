@@ -1,32 +1,69 @@
 //index.js
 const api = require('../../libs/api');
 
+// 时间格式化函数
+function formatTime(timeStr) {
+    if (!timeStr || typeof timeStr !== 'string') return '--:--';
+    try {
+        // 从 "20230512140000" 格式转换为 "HH:MM"
+        const year = timeStr.substring(0, 4);
+        const month = timeStr.substring(4, 6);
+        const day = timeStr.substring(6, 8);
+        const hour = timeStr.substring(8, 10);
+        const minute = timeStr.substring(10, 12);
+
+        // 如果是当前日期，只显示时间；如果是未来日期，显示日期+时间
+        const now = new Date();
+        const currentDate = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+
+        if (year + month + day === currentDate) {
+            return `${hour}:${minute}`;
+        } else {
+            return `${month}/${day} ${hour}:${minute}`;
+        }
+    } catch (e) {
+        console.error('时间格式化错误:', e);
+        return '--:--';
+    }
+}
+
 Page({
     data: {
-        citySelected: {},
+        citySelected: [],
         weatherData: {},
         topCity: {},
-        current: 0
+        current: 0,
+        isLoading: false,
+        hasError: false,
+        errorMessage: ''
+    },
+
+    /**
+     * 时间格式化过滤器
+     */
+    formatTime: function (timeStr) {
+        return formatTime(timeStr);
     },
 
     /**
      * 显示天气管理页面
      */
     showDetailPage: function (event) {
-        // 从属性data-city_code获取数据
-        let cityAdCode = event.currentTarget.dataset.city_code || '';
+        const cityAdCode = event.currentTarget.dataset.city_code || '';
+        if (!cityAdCode) return;
 
         wx.navigateTo({
             url: '../detail/detail?city_code=' + cityAdCode
-        })
+        });
     },
+
     /**
      * 显示城市管理页面
      */
     showSettingPage: function () {
         wx.navigateTo({
             url: '../setting/setting'
-        })
+        });
     },
     /**
      * 更新首页顶部的显示的城市信息
@@ -97,27 +134,90 @@ Page({
      * 生命周期函数--监听页面显示
      */
     onShow: function () {
-        let citySelected = wx.getStorageSync('citySelected');
-        let weatherData = wx.getStorageSync('weatherData');
-        this.setHomeData(citySelected, weatherData)
-        wx.setStorageSync('isDetail', false)
+        const citySelected = wx.getStorageSync('citySelected') || [];
+        const weatherData = wx.getStorageSync('weatherData') || {};
+
+        if (citySelected.length === 0) {
+            // 如果没有城市数据，显示错误信息
+            this.setData({
+                hasError: true,
+                errorMessage: '请先添加城市'
+            });
+        } else {
+            this.setHomeData(citySelected, weatherData);
+            this.setData({ hasError: false });
+        }
+
+        wx.setStorageSync('isDetail', false);
+    },
+
+    /**
+     * 隐藏错误提示
+     */
+    hideError() {
+        this.setData({ hasError: false, errorMessage: '' });
     },
 
     /**
      * 更新已管理城市的天气数据
      */
     updateWeatherData() {
-        let citySelected = wx.getStorageSync('citySelected');
-        let weatherData = wx.getStorageSync('weatherData') || {};
-        let that = this;
-        for (let idx in citySelected) {
-            let cityAdCode = citySelected[idx];
-            api.getWeatherData(cityAdCode, function (cityAdCode, data) {
-                weatherData = wx.getStorageSync('weatherData') || {};
-                weatherData[cityAdCode] = data;
+        const citySelected = wx.getStorageSync('citySelected') || [];
+        const that = this;
+
+        // 设置加载状态
+        this.setData({ isLoading: true, hasError: false });
+
+        let completedCount = 0;
+        const totalCount = citySelected.length;
+
+        citySelected.forEach(cityAdCode => {
+            api.getWeatherData(cityAdCode, (code, data) => {
+                const weatherData = wx.getStorageSync('weatherData') || {};
+                weatherData[code] = data;
                 wx.setStorageSync('weatherData', weatherData);
-                that.setHomeData(citySelected, weatherData);
+
+                completedCount++;
+                if (completedCount === totalCount) {
+                    that.setHomeData(citySelected, weatherData);
+                    that.setData({ isLoading: false });
+                    wx.stopPullDownRefresh();
+                }
             });
+        });
+
+        // 设置超时处理
+        setTimeout(() => {
+            if (this.data.isLoading) {
+                this.setData({
+                    isLoading: false,
+                    hasError: true,
+                    errorMessage: '数据加载超时，请检查网络连接'
+                });
+                wx.stopPullDownRefresh();
+            }
+        }, 10000);
+    },
+
+    /**
+     * 下拉刷新处理
+     */
+    onPullDownRefresh() {
+        this.updateWeatherData();
+    },
+
+    /**
+     * 获取城市名称，添加错误处理
+     * @param citySelected 城市列表
+     * @param weatherData 天气数据
+     * @param index 城市索引
+     */
+    getCityName(citySelected, weatherData, index) {
+        try {
+            return citySelected[index] ? weatherData[citySelected[index]].realtime.city_name : "";
+        } catch (e) {
+            console.error('获取城市名称错误：', e.message);
+            return "";
         }
     },
 
@@ -127,48 +227,21 @@ Page({
      * @param weatherData 天气信息
      */
     setHomeData: function (citySelected, weatherData) {
-        let isDetail = wx.getStorageSync("isDetail") || false;
-        let removeCount = wx.getStorageSync('removeCount');
+        const isDetail = wx.getStorageSync("isDetail") || false;
+
         if (!isDetail) {
-            let topCity = {
-                left: "",
-                center: "",
-                right: "",
+            const currentPage = wx.getStorageSync('currentPage') || 0;
+            const topCity = {
+                left: this.getCityName(citySelected, weatherData, currentPage - 1),
+                center: this.getCityName(citySelected, weatherData, currentPage),
+                right: this.getCityName(citySelected, weatherData, currentPage + 1)
             };
-            let currentPage = wx.getStorageSync('currentPage');
-            if (currentPage == 0 || removeCount >= 2) {
-                try {
-                    topCity.center = weatherData[citySelected[0]].realtime.city_name;
-                } catch (e) {
-                    console.error('获取顶部中间城市名错误：', e.message)
-                }
-                try {
-                    topCity.right = weatherData[citySelected[1]].realtime.city_name;
-                } catch (e) {
-                    console.error('获取顶部右边城市名错误：', e.message)
-                }
-            } else {
-                try {
-                    topCity.left = weatherData[citySelected[currentPage - 1]].realtime.city_name;
-                } catch (e) {
-                    console.error('获取顶部左边城市名错误：', e.message)
-                }
-                try {
-                    topCity.center = weatherData[citySelected[currentPage]].realtime.city_name;
-                } catch (e) {
-                    console.error('获取顶部中间城市名错误：', e.message)
-                }
-                try {
-                    topCity.right = weatherData[citySelected[currentPage + 1]].realtime.city_name;
-                } catch (e) {
-                    console.error('获取顶部右边城市名错误：', e.message)
-                }
-            }
+
             this.setData({
                 weatherData: weatherData,
                 topCity: topCity,
                 citySelected: citySelected,
-            })
+            });
         }
     },
 })

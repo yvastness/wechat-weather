@@ -1,27 +1,41 @@
 <!-- setting.wxml -->
-<view>
-    <scroll-view class="container" scroll-y="true" scroll-with-animation="true">
-        <view class="city-selected">
-            <view class="item" wx:for="{{citySelected}}" wx:key="dayIndex" wx:for-item="cityAdCode">
-                <view class="name">{{weatherData[cityAdCode].realtime.city_name}}</view>
-                <image class="icon" src="{{ weatherData[cityAdCode].realtime.weather.icon }}"></image>
-                <view class="desc">
-                    <text>{{weatherData[cityAdCode].realtime.weather.info}}</text>
-                    <text>
-                        {{weatherData[cityAdCode].realtime.wind.direct}} {{weatherData[cityAdCode].realtime.wind.power}}
-                    </text>
+<view class="container">
+    <scroll-view class="setting-scroll" scroll-y="true" scroll-with-animation="true">
+        <view class="header">
+            <view class="header-bg"></view>
+            <text class="title">城市管理</text>
+            <view class="back-icon" bindtap="goBack">
+                <text class="back-text">←</text>
+            </view>
+        </view>
+
+        <view class="city-list">
+            <view class="city-item" wx:for="{{citySelected}}" wx:key="dayIndex" wx:for-item="cityAdCode">
+                <view class="city-main">
+                    <view class="city-info">
+                        <text class="city-name">{{weatherData[cityAdCode].realtime.city_name}}</text>
+                        <image class="weather-icon" src="{{ weatherData[cityAdCode].realtime.weather.icon }}"></image>
+                        <view class="weather-desc">
+                            <text>{{weatherData[cityAdCode].realtime.weather.info}}</text>
+                            <text class="wind">{{weatherData[cityAdCode].realtime.wind.direct}} {{weatherData[cityAdCode].realtime.wind.power}}</text>
+                        </view>
+                    </view>
+                    <view class="city-temp">
+                        <text class="temp">{{weatherData[cityAdCode].realtime.weather.temperature}}°</text>
+                    </view>
                 </view>
-                <view class="temperature">
-                    <text>{{weatherData[cityAdCode].realtime.weather.temperature}}°</text>
-                </view>
-                <view class="remove">
-                    <icon type="cancel" size="15" bindtap="removeCity" data-city_code="{{ cityAdCode }}"/>
+                <view class="remove-btn" bindtap="removeCity" data-city_code="{{ cityAdCode }}">
+                    <text class="remove-text">×</text>
                 </view>
             </view>
-            <button class="city-choose" type="primary" loading="{{loading}}" disabled="{{disabled}}"
-                    bindtap="showSelector">
-                + 添加城市
-            </button>
+
+            <view class="add-section">
+                <button class="add-city-btn" loading="{{loading}}" disabled="{{disabled}}" bindtap="showSelector">
+                    <text class="btn-icon">+</text>
+                    <text class="btn-text">添加城市</text>
+                </button>
+            </view>
+
             <selector-component show="{{selectorVisible}}" key="O3QBZ-LPRAV-5GWPE-5MWZG-WZSQ5-YSBLS" referer="天气帮手"
                                 hotCitys="北京,上海,天津,重庆,广州,深圳,成都,杭州"
                                 bindselect="onSelectCity"></selector-component>

@@ -1,68 +1,199 @@
 /* setting.wxss */
 
-/* ------- city selected --------- */
-.city-selected .item {
+.container {
+    height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    flex-direction: column;
+}
+
+.setting-scroll {
+    height: 100%;
+}
+
+/* 顶部标题栏 */
+.header {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
     padding: 20rpx 30rpx;
-    margin: 20rpx;
     display: flex;
-    border-radius: 20rpx;
-    flex-direction: row;
-    background: #fff;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 1rpx solid rgba(255, 255, 255, 0.2);
+    position: relative;
 }
 
-.city-selected .item .name {
-    width: 150rpx;
-    line-height: 60rpx;
-    font-size: 28rpx;
-    padding-top: 5rpx;
-    margin-right: 20rpx;
+.header-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 100%);
+    z-index: -1;
 }
 
-.city-selected .item .icon {
+.title {
+    font-size: 36rpx;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 2rpx 2rpx 4rpx rgba(0, 0, 0, 0.2);
+}
+
+.back-icon {
+    position: absolute;
+    left: 30rpx;
     width: 60rpx;
-    margin-right: 20rpx;
-    margin-left: 20rpx;
     height: 60rpx;
-}
-
-.city-selected .item .desc {
-    flex-direction: column;
     display: flex;
-    width: 100px;
-    margin-left: 30rpx;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transition: all 0.3s ease;
 }
 
-.city-selected .item .desc text {
-    font-size: 20rpx;
-    color: #404040;
-    line-height: 25rpx;
-    margin-top: 5rpx;
-    margin-left: 20rpx;
+.back-icon:active {
+    transform: scale(0.9);
+    background: rgba(255, 255, 255, 0.2);
 }
 
-.city-selected .item .temperature {
+.back-text {
+    font-size: 36rpx;
+    color: #fff;
+    line-height: 1;
+}
+
+/* 城市列表 */
+.city-list {
+    padding: 30rpx;
+}
+
+.city-item {
+    background: #fff;
+    border-radius: 20rpx;
+    margin-bottom: 20rpx;
+    padding: 20rpx;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.city-item:active {
+    transform: scale(0.98);
+}
+
+.city-main {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.city-info {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.city-name {
+    font-size: 32rpx;
+    font-weight: 500;
+    color: #333;
+    margin-right: 20rpx;
+    min-width: 120rpx;
+}
+
+.weather-icon {
+    width: 60rpx;
+    height: 60rpx;
+    margin-right: 20rpx;
+}
+
+.weather-desc {
+    display: flex;
+    flex-direction: column;
+}
+
+.weather-desc text:first-child {
     font-size: 28rpx;
-    margin-right: 30rpx;
-    padding-top: 5rpx;
-    line-height: 60rpx;
-    margin-left: 30rpx;
+    color: #333;
+    margin-bottom: 5rpx;
 }
 
-.city-selected .item .remove {
-    padding-top: 15rpx;
-    margin-left: 30rpx;
+.weather-desc .wind {
+    font-size: 24rpx;
+    color: #666;
 }
 
-.city-selected .add {
-    font-size: 25rpx;
-    flex-direction: column;
+.city-temp {
     display: flex;
-    text-align: center;
     align-items: center;
 }
 
-.city-choose {
+.temp {
+    font-size: 48rpx;
+    font-weight: 300;
+    color: #667eea;
+}
+
+.remove-btn {
+    width: 50rpx;
+    height: 50rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ff4444;
+    border-radius: 50%;
     margin-left: 20rpx;
-    padding-top: 15rpx;
-    margin-right: 20rpx;
+    transition: all 0.3s ease;
+}
+
+.remove-btn:active {
+    transform: scale(0.9);
+    background: #ff6666;
+}
+
+.remove-text {
+    font-size: 36rpx;
+    color: #fff;
+    line-height: 1;
+}
+
+/* 添加城市按钮 */
+.add-section {
+    margin-top: 40rpx;
+}
+
+.add-city-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50rpx;
+    padding: 25rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4rpx 20rpx rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
+}
+
+.add-city-btn:active {
+    transform: scale(0.98);
+    box-shadow: 0 2rpx 10rpx rgba(102, 126, 234, 0.3);
+}
+
+.add-city-btn[disabled] {
+    opacity: 0.6;
+}
+
+.btn-icon {
+    font-size: 40rpx;
+    color: #fff;
+    margin-right: 10rpx;
+}
+
+.btn-text {
+    font-size: 30rpx;
+    color: #fff;
+    font-weight: 500;
 }

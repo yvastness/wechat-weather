@@ -1,12 +1,77 @@
 /* detail.wxss */
 
-@import "../index/index.wxss";
+.container {
+    height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    flex-direction: column;
+}
 
+/* 顶部城市信息 */
+.header {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 20rpx 30rpx;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1rpx solid rgba(255, 255, 255, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.header-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 100%);
+    z-index: -1;
+}
+
+.city-info {
+    display: flex;
+    align-items: center;
+}
+
+.city-name {
+    font-size: 36rpx;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 2rpx 2rpx 4rpx rgba(0, 0, 0, 0.2);
+}
+
+.back-icon {
+    width: 60rpx;
+    height: 60rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.back-icon:active {
+    transform: scale(0.9);
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.back-text {
+    font-size: 36rpx;
+    color: #fff;
+    line-height: 1;
+}
+
+/* 日期信息 */
 .date {
     padding-top: 0rpx;
     margin-top: 0rpx;
+    color: #fff;
 }
 
+/* 白天夜晚天气 */
 .day-desc {
     font-size: 25rpx;
     color: #fff;
@@ -22,7 +87,7 @@
 
 .day-night .split {
     border: none;
-    border-left: 1rpx dashed #eee;
+    border-left: 1rpx dashed rgba(255, 255, 255, 0.5);
     height: 80rpx;
     width: 0rpx;
     padding: 0;
@@ -31,6 +96,8 @@
 
 .today {
     padding-top: 20rpx;
+    padding: 40rpx 30rpx;
+    position: relative;
 }
 
 .today .weather {
@@ -40,18 +107,25 @@
 
 .today .weather .icon {
     margin: 0 10rpx;
+    width: 100rpx;
+    height: 100rpx;
 }
 
 .today .weather .desc {
     margin: 0 10rpx;
     float: right;
     width: 140rpx;
+    color: #fff;
 }
 
-/* life */
+.today .weather .desc text {
+    color: #fff;
+}
+
+/* life 生活指数 */
 
 .card-list {
-    margin-top: -280rpx;
+    margin-top: 30rpx;
 }
 
 .card {
@@ -59,6 +133,10 @@
     margin-left: 20rpx;
     margin-right: 20rpx;
     color: #404040;
+    background: #fff;
+    border-radius: 30rpx;
+    padding: 30rpx;
+    box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.1);
 }
 
 .card .title {
@@ -66,34 +144,43 @@
     text-align: center;
     padding-bottom: 5px;
     margin: 0 100rpx 5px;
-    font-size: 30rpx;
-    border-bottom: 1rpx dashed #eee;
+    font-size: 32rpx;
+    font-weight: bold;
+    color: #333;
+    border-bottom: 1rpx solid #f0f0f0;
 }
 
 .life .item {
     display: inline-block;
+    width: 50%;
 }
 
 .life .item .line {
     margin: 10rpx;
-    padding: 10rpx;
+    padding: 20rpx;
     border-radius: 20rpx;
-    border: 1px solid #49c44a;
+    border: 1px solid #e0e0e0;
     display: flex;
     flex-direction: row;
-    width: 310rpx;
+    align-items: center;
+    background: #f8f8f8;
 }
 
 .life .item .icon {
     width: 48rpx;
     height: 48rpx;
-    margin: 0 20rpx;
+    margin: 0 15rpx;
 }
 
 .life .item .name, .life .item .desc {
     font-size: 25rpx;
     line-height: 48rpx;
     padding-top: 5rpx;
+    color: #333;
+}
+
+.life .item .desc {
+    color: #666;
 }
 
 .life .item .desc text {

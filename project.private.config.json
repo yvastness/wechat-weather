@@ -3,7 +3,21 @@
   "projectname": "wechat-weather",
   "setting": {
     "compileHotReLoad": true,
-    "urlCheck": false
+    "urlCheck": false,
+    "coverView": true,
+    "lazyloadPlaceholderEnable": false,
+    "skylineRenderEnable": false,
+    "preloadBackgroundData": false,
+    "autoAudits": false,
+    "useApiHook": true,
+    "showShadowRootInWxmlPanel": true,
+    "useStaticServer": false,
+    "useLanDebug": false,
+    "showES6CompileOption": false,
+    "checkInvalidKey": true,
+    "ignoreDevUnusedFiles": true,
+    "bigPackageSizeSupport": false
   },
-  "libVersion": "2.31.0"
+  "libVersion": "3.15.1",
+  "condition": {}
 }

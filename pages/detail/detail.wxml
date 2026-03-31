@@ -1,11 +1,14 @@
 <!--detail.wxml-->
-<view>
-    <view class="top_city">
-        <view class="city_list">
-            <view class="city_item city_item_center">
-                {{topCity.center}}
-            </view>
+<view class="container">
+    <!-- 顶部城市信息 -->
+    <view class="header">
+        <view class="city-info">
+            <text class="city-name">{{topCity.center}}</text>
         </view>
+        <view class="back-icon" bindtap="goBack">
+            <text class="back-text">←</text>
+        </view>
+        <view class="header-bg"></view>
     </view>
 
     <scroll-view class="container" scroll-y="true" scroll-with-animation="true">

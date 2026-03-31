@@ -1,57 +1,125 @@
 <!--index.wxml-->
-<view>
-    <view class="top_city" bindtap="showSettingPage">
-        <view class="city_list">
-            <view class="city_item city_item_left">
-                {{topCity.left}}
+<view class="container">
+    <!-- 错误提示 -->
+    <view class="error-toast {{hasError ? 'show' : ''}}" bindtap="hideError">
+        <text class="error-text">{{errorMessage}}</text>
+    </view>
+
+    <!-- 顶部城市选择器 -->
+    <view class="header" bindtap="showSettingPage">
+        <view class="city-selector">
+            <view class="city-item city-item-prev {{topCity.left ? '' : 'city-item-empty'}}">
+                {{topCity.left || '暂无'}}
             </view>
-            <view class="city_item city_item_center">
+            <view class="city-item city-item-current">
                 {{topCity.center}}
             </view>
-            <view class="city_item city_item_right">
-                {{topCity.right}}
+            <view class="city-item city-item-next {{topCity.right ? '' : 'city-item-empty'}}">
+                {{topCity.right || '暂无'}}
             </view>
+        </view>
+        <view class="setting-icon">
+            <text class="setting-icon-text">⚙️</text>
         </view>
     </view>
 
-    <swiper class="container" bindchange="updateTopCity" style="background:#42c642;">
+    <!-- 加载状态 -->
+    <view class="loading-mask {{isLoading ? 'show' : ''}}">
+        <view class="loading-spinner"></view>
+        <text class="loading-text">正在更新天气数据...</text>
+    </view>
+
+    <!-- 天气内容区域 -->
+    <swiper class="weather-swiper" bindchange="updateTopCity" indicator-dots="{{false}}" autoplay="{{false}}">
         <block wx:for="{{citySelected}}" wx:key="cityIdx" wx:for-item="cityAdCode">
             <swiper-item>
-                <!-- 滑动模块 -->
-                <scroll-view class="container" scroll-y="true" scroll-with-animation="true">
-                    <view class="today" bindtap="showDetailPage" data-city_code="{{ cityAdCode }}">
-                        <view class="weather">
-                            <image class="icon" src="{{ weatherData[cityAdCode].realtime.weather.icon }}"></image>
-                            <view class="desc">
-                                <text>{{weatherData[cityAdCode].realtime.weather.info}}</text>
-                                <text>{{weatherData[cityAdCode].realtime.wind.direct}}
-                                    {{weatherData[cityAdCode].realtime.wind.power}}</text>
+                <scroll-view class="weather-scroll" scroll-y="true" scroll-with-animation="true" refresher-enabled="{{true}}" refresher-triggered="{{isLoading}}">
+                    <!-- 当前天气信息 -->
+                    <view class="current-weather" bindtap="showDetailPage" data-city_code="{{ cityAdCode }}">
+                        <!-- 背景渐变 -->
+                        <view class="weather-bg"></view>
+
+                        <!-- 天气图标和基本信息 -->
+                        <view class="weather-main">
+                            <image class="weather-icon" src="{{weatherData[cityAdCode].realtime.weather.icon}}"></image>
+                            <view class="weather-info">
+                                <text class="weather-desc">{{weatherData[cityAdCode].realtime.weather.info}}</text>
+                                <text class="wind-info">{{weatherData[cityAdCode].realtime.wind.direct}} {{weatherData[cityAdCode].realtime.wind.power}}</text>
                             </view>
                         </view>
-                        <view class="temperature">
-                            <text>{{weatherData[cityAdCode].realtime.weather.temperature}}°</text>
+
+                        <!-- 温度显示 -->
+                        <view class="temperature-display">
+                            <text class="temp-value">{{weatherData[cityAdCode].realtime.weather.temperature}}°</text>
                         </view>
-                        <view class="more">
-                            <text>湿度 : {{weatherData[cityAdCode].realtime.weather.humidity}}</text>
-                            <text>PM2.5 : {{weatherData[cityAdCode].pm25.pm25.curPm}}</text>
-                            <text>{{weatherData[cityAdCode].pm25.pm25.quality}}</text>
+
+                        <!-- 其他天气信息 -->
+                        <view class="weather-details">
+                            <view class="detail-item">
+                                <text>湿度</text>
+                                <text>{{weatherData[cityAdCode].realtime.weather.humidity}}%</text>
+                            </view>
+                            <view class="detail-item">
+                                <text>PM2.5</text>
+                                <text>{{weatherData[cityAdCode].pm25.pm25.curPm}}</text>
+                            </view>
+                            <view class="detail-item">
+                                <text>空气质量</text>
+                                <text>{{weatherData[cityAdCode].pm25.pm25.quality}}</text>
+                            </view>
                         </view>
                     </view>
-                    <!-- 设置弧形美化 -->
-                    <view class="today-bottom"></view>
 
-                    <!-- 未来几天的天气信息 -->
-                    <view class="feature">
-                        <view class="day" wx:for="{{weatherData[cityAdCode].weather}}" wx:key="dayIdx">
-                            <view class="date">{{item.shortDate}}</view>
-                            <view class="date">周{{item.week}}</view>
-                            <image class="icon" src="{{item.day_icon}}"></image>
-                            <view class="desc">
-                                <text>{{item.info.day[1]}}</text>
-                                <text>{{item.info.day[3]}} {{item.info.day[4]}}</text>
+                    <!-- 今日天气预报（24小时预报） -->
+                    <view class="today-forecast-section" wx:if="{{weatherData[cityAdCode].f3h}}">
+                        <view class="section-title">
+                            <text>今日天气预报</text>
+                        </view>
+                        <scroll-view class="hourly-scroll" scroll-x="true" scroll-with-animation="true">
+                            <view class="hourly-list">
+                                <view class="hourly-item" wx:for="{{weatherData[cityAdCode].f3h.temperature}}" wx:key="hourIdx">
+                                    <text class="time">{{formatTime(item.jg)}}</text>
+                                    <text class="temp">{{item.jb}}°</text>
+                                    <text class="precip" wx:if="{{weatherData[cityAdCode].f3h.precipitation[hourIdx].jf > 0}}">
+                                        {{weatherData[cityAdCode].f3h.precipitation[hourIdx].jf}}mm
+                                    </text>
+                                </view>
                             </view>
-                            <view class="temperature">
-                                <text>{{item.info.night[2]}}~{{item.info.day[2]}}°</text>
+                        </scroll-view>
+                    </view>
+
+                    <!-- 未来几天天气预报 -->
+                    <view class="forecast-section">
+                        <view class="section-title">
+                            <text>未来16天天气预报</text>
+                        </view>
+                        <view class="forecast-list">
+                            <view class="forecast-item" wx:for="{{weatherData[cityAdCode].weather}}" wx:key="dayIdx">
+                                <view class="date-info">
+                                    <text class="date">{{item.shortDate}}</text>
+                                    <text class="week">周{{item.week}}</text>
+                                </view>
+                                <image class="day-icon" src="{{item.day_icon}}"></image>
+                                <view class="weather-desc">
+                                    <text>{{item.info.day[1]}}</text>
+                                    <text class="wind">{{item.info.day[3]}} {{item.info.day[4]}}</text>
+                                </view>
+                                <view class="temp-range">
+                                    <text>{{item.info.night[2]}}~{{item.info.day[2]}}°</text>
+                                </view>
+                            </view>
+                        </view>
+                    </view>
+
+                    <!-- 生活指数 -->
+                    <view class="life-index-section" wx:if="{{weatherData[cityAdCode].life.lifeIndexInfo}}">
+                        <view class="section-title">
+                            <text>生活指数</text>
+                        </view>
+                        <view class="life-index-grid">
+                            <view class="index-item" wx:for="{{weatherData[cityAdCode].life.lifeIndexInfo}}" wx:key="index">
+                                <image class="index-icon" src="{{item.icon}}"></image>
+                                <text class="index-name">{{item.name}}</text>
                             </view>
                         </view>
                     </view>

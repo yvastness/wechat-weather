@@ -6,9 +6,9 @@
   ],
   "window": {
     "backgroundTextStyle": "dark",
-    "backgroundColor": "#42c642",
-    "navigationBarBackgroundColor": "#42c642",
-    "navigationBarTitleText": "我的天气程序",
+    "backgroundColor": "#667eea",
+    "navigationBarBackgroundColor": "#667eea",
+    "navigationBarTitleText": "暖煦生辉",
     "navigationBarTextStyle": "white"
   },
   "lazyCodeLoading": "requiredComponents",

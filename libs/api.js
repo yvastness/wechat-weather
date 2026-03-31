@@ -1,19 +1,12 @@
+const config = require('./config');
+
 // 获取本地城市天气数据的 api
-const LocalWeatherApi = 'https://open.onebox.so.com/Dataapi?&query=%E5%A4%A9%E6%B0%94&type=weather&ip=&src=soindex&d=pc&url=weather';
+const LocalWeatherApi = config.api.localWeather;
 // 通过城市 adCode 作为参数获取城市天气数据的 api
-const CityWeatherApi = 'https://open.onebox.so.com/Dataapi?callback=&query=%E5%8C%97%E4%BA%AC%E5%B8%82%E5%8C%97%E4%BA%AC%E6%B5%B7%E6%B7%80%E5%A4%A9%E6%B0%94&type=weather&ip=&src=soindex&d=pc&url=http%253A%252F%252Fcdn.weather.hao.360.cn%252Fsed_api_weather_info.php%253Fapp%253DguideEngine%2526fmt%253Djson%2526code%253D';
+const CityWeatherApi = config.api.cityWeather;
 // 将从腾讯地图城市选择器获取的6位数的 adCode 转换获取10位数的 adCode
-const qweatherCityApi = 'https://geoapi.qweather.com/v2/city/lookup?key=8cbf558f85dd40ff86f528b2370236b8&location=';
-let lifeIndexNames = {
-    diaoyu: "钓鱼",
-    xiche: "行车",
-    yundong: "运动",
-    daisan: "带伞",
-    ganmao: "感冒",
-    ziwaixian: "紫外线",
-    guomin: "过敏",
-    chuanyi: "穿衣",
-};
+const qweatherCityApi = config.api.qweatherCity;
+const lifeIndexNames = config.lifeIndexNames;
 
 /**
  * 加载获取天气数据
@@ -22,23 +15,24 @@ let lifeIndexNames = {
  * @param callback 回调函数
  */
 function getWeatherData(cityAdCode, callback) {
-    let WeatherApi = LocalWeatherApi;
-    // 如果不是本地城市的adCode就使用获取其他城市的api
-    if (cityAdCode !== "" && cityAdCode !== "local_adCode") {
-        WeatherApi = CityWeatherApi + cityAdCode;
-    }
+    const WeatherApi = (cityAdCode && cityAdCode !== config.defaultCity)
+        ? CityWeatherApi + cityAdCode
+        : LocalWeatherApi;
+
     wx.request({
         url: WeatherApi,
-        data: {},
         success: res => {
-            if (res.data.length === 0 || res.statusCode !== 200) {
+            if (!res.data || res.statusCode !== 200) {
                 return;
             }
-            let weatherData = parseWeatherData(res.data);
+            const weatherData = parseWeatherData(res.data);
             // 回调函数实现同步调用
-            typeof callback == "function" && callback(cityAdCode, weatherData)
+            typeof callback === "function" && callback(cityAdCode, weatherData);
+        },
+        fail: error => {
+            console.error('获取天气数据失败:', error);
         }
-    })
+    });
 }
 
 /**
